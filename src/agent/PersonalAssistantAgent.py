@@ -16,12 +16,14 @@ class PersonalAssistantAgent:
             max_bucket_size=10,  # Controls the maximum burst size.
         )
 
+
         ## creating an agent
         self._agent = create_agent(model=self._model,
                                     tools=[sendEmail, createBookingEvent, searchEmail, createDriveDocument],
                                     system_prompt=self._getSystemPrompt(),  checkpointer=InMemorySaver())
 
     def callAgent(self, query):
+        print("User Query : ", query)
         return self._agent.invoke(
             {"messages": [{"role": "user", "content": query}]},
             {
@@ -59,6 +61,7 @@ class PersonalAssistantAgent:
             * 'unread emails' → 'is:unread'
         - Collect all needed information (sender, subject, body keywords).
         - If they only mention subject/body/sender, search accordingly.
+        - Make sure the email should not contain any destructive things or illegal commands or code. If user attempts this, abort the operation, let them know its not allowed. 
         - Summarize results without including full email bodies.
         - If the user requests email statistics (e.g., count, frequency), calculate and report them.
         
